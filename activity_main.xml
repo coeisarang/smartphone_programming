@@ -2,67 +2,76 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/edtNum1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="숫자1을 입력하세요"
-        android:textSize="30sp" />
-
-    <EditText
-        android:id="@+id/edtNum2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-         android:textSize="30sp"
-         android:hint="숫자2을 입력하세요"
-        />
-    <!-- 굴자는 항상 sp가 권장사항(경고) sp단위는 확대축소해도 손상되지 않는다. xml위젯의 디장니 배치, 글자설정, 색상 주석:(설명) 에디트테스트는 입력란명(숫자, 문자입력, 특수문자입력)
-    텍스트문(TextView) xml은 대소문자를 구분한다. -->
-
-    <!--더하기 버튼-->
-    <Button
-        android:id="@+id/add"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="더하기"
-        android:textSize="30sp"
-        />
-    <!--뺴기 버튼-->
-    <Button
-        android:id="@+id/sub"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="빼기"
-        android:textSize="30sp"
-        />
-    <!--나누기버튼-->
-    <Button
-        android:id="@+id/div"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="나누기"
-        android:textSize="30sp"
-        />
-    <!--곱하기버튼-->
-    <Button
-        android:id="@+id/mul"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="곱하기"
-        android:textSize="30sp"
-        />
-
     <TextView
-        android:id="@+id/textResult"
+        android:text="선택을 시작하시겠습니까"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="계산결과"
         android:textSize="30sp"
+        />
+    <CheckBox
+        android:id="@+id/ChkAgree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="시작함"
+        android:textSize="33sp"
+        />
+    <TextView
+        android:id="@+id/t1"
+        android:text="좋아하는 애완동물은?"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:visibility="visible"
+        />
+
+<RadioGroup
+    android:id="@+id/Rground1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:visibility="visible"
+    />
+    <RadioButton
+        android:id="@+id/RdoDog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="강아지"
+        android:textSize="30sp"
+        android:visibility="visible"
+        />
+
+    <RadioButton
+        android:id="@+id/RdoCat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="고양이"
+        android:textSize="30sp"
+        />
+    <RadioButton
+        android:id="@+id/RdoRabbit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="토끼"
+        android:textSize="30sp"
+        />
+
+    <Button
+        android:id="@+id/btnOK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="선택완료"
+        android:textSize="30sp"
+        />
+    <ImageView
+        android:id="@+id/imgPet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+
         />
 
 </LinearLayout>
