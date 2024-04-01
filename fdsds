@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+<TextView
+    android:text="20203455최사랑로그인"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textSize="40sp"
+    />
+    <EditText
+        android:id="@+id/edtId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="로그인할 ID를 입력해 주세요."
+        android:textSize="30sp"
+        />
+    <EditText
+        android:id="@+id/edtPw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="로그인할 PW를 입력해 주세요."
+        android:textSize="30sp"
+        />
+  <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      >
+        <Button
+            android:id="@+id/mainLoginBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="로그인"
+            android:textSize="30sp"
+            />
+        <Button
+            android:id="@+id/mainJoinBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="회원가입"
+            android:textSize="30sp"
+            />
+    </LinearLayout>
+
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="50sp"
+        android:text="회원가입화면"
+     />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/jId"
+        android:hint="갸입할 ID를 입력해 주세요."
+        android:textSize="20sp"
+        />
+    <EditText
+        android:id="@+id/jPw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:hint="Pw:가입할 비밀번호를 입력해 주세요."
+        android:password="true"
+        /><!--비밀번호 입력시 밑줄이 있지만 동작됨 ***처리 -->
+    <Button
+        android:id="@+id/j_Registration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="회원가입버튼"
+        android:textSize="30sp"
+        /> <!--MainActivity를 작성하러 갑니다. -->
+</LinearLayout>
+
+
+
+
+
+
+
+
+package kc.ac.login20203455;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+
+public class MainActivity extends join {
+    //회원가입(화면 join.java) 후 로그인
+    EditText mainId, mainPw;
+    Button btnJoin, btnLogin;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mainId=(EditText) findViewById(R.id.edtId);
+        mainPw=(EditText) findViewById(R.id.edtPw);
+        btnJoin=(Button) findViewById(R.id.mainJoinBtn);
+        btnLogin=(Button) findViewById(R.id.mainLoginBtn);
+
+    }//onCreate()
+}//MainActivity
+
+
+
+
+
+
+
+
+
+
+
+
+
+package kc.ac.login20203455;
+
+import android.app.Activity;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class join extends Activity{
+    //필수 onCreate() code.override  커서는 내부에 두고
+    EditText j_Id, j_Pw;
+    Button j_btn1; //회원가입을 해야함, DB 생성 ->Table 생성 ->(버튼클릭시) 회원 1건씩 추가
+    myDBHelper myDBHelper;
+    SQLiteDatabase sqlDB; //읽기 쓰기 DB 열 용도
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.join); //join/.xml을 화면에 설정
+            myDBHelper = new myDBHelper(this);
+
+            j_Id =(EditText) findViewById(R.id.jId);
+            j_Pw =(EditText) findViewById(R.id.jPw);
+            j_btn1=(EditText)findViewById(R.id.j_Registration);
+
+            j_btn1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sqlDB=myDBHelper.getWritableDatabase();
+                    sqlDB.execSQL("INSERT INTO Join_info VALUES('"+
+                            j_Id.getText().toString()+"','"+
+                            j_Pw.getText().toString()+"');");
+                    sqlDB.close();
+
+
+    }
+});
+
+        }//onCreate()
+       public class myDBHelper extends SQLiteOpenHelper{
+            //code.override 필수 메소드 2개 생성자(DB생성), onCreate(테이블생성),
+           public myDBHelper(Context context){
+           super (context, "LoginDB", null,1 );
+       }
+
+           @Override
+           public void onCreate(SQLiteDatabase db) {
+               db.execSQL("CREATE TABLE JoinInfo(uId TEXT, uPassword TEXT);");
+           }
+
+           @Override
+           public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+               db.execSQL("DROP TABLE IF EXISTS JoinInfo");
+               onCreate(db);
+           }//onUpgrade()
+           }
+       }
+
+
+
+
