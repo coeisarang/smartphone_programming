@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <!--그룹이름: 그룹1 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+    >
+     <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="걸그룹이름: "
+         android:textSize="30sp"
+         />
+
+        <EditText
+            android:id="@+id/edtName"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="걸그룹인원: "
+            android:textSize="30sp"
+            />
+
+        <EditText
+            android:id="@+id/edtNumber"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
+    <!--버튼 배치 1건 추가, 삭제, 조회, 수정 초기화 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+        <Button
+            android:id="@+id/btnInsert"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="입력"
+            android:textSize="15sp"
+            />
+        <Button
+            android:id="@+id/btnSelect"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="조회"
+            android:textSize="15sp"
+        />
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="삭제"
+            android:textSize="15sp"
+            />
+        <Button
+            android:id="@+id/btnUpdate"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="수정"
+            android:textSize="15sp"
+            />
+        <Button
+            android:id="@+id/btnInit"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="초기화"
+            android:textSize="12dp"
+            />
+
+    </LinearLayout>
+ <!--전체그룹이름 String 모음, 전체인원수 모음 8 가중치 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8"
+        android:background="#FF0088"
+        >
+        <EditText
+            android:id="@+id/edtNamResult"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+        />
+        <EditText
+            android:id="@+id/edtNumResult"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="#0000FF"
+            android:layout_height="match_parent"
+        />
+    </LinearLayout>
+   <!--여기서 matvh_parent 는 8비율을 다 분배함을 의미,1은 비율이 되지만
+   1:1:1:8 layout_weght 가중치 화면의 분배비율(높이), LinerLayout 컨테이너의 방향을 안주면 default 가 horizen이다.-->
+</LinearLayout>
+
+
+
+
+//MainActivity.java
+
+
+package kc.ac.dbproject20203455;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+//데이터 베이스 먼저 생성 SQLiteOpenHegler클래스 (테이블도생성)로 생성, 인스턴스 생성해서 사용함
+    //MainActivity 클래스 에 있음, SQLiteOpenHegler클래스(내부 클래스)를 상속 받아서 MainActivity 내부에서 사용
+    myDBHelper myHelper; //객체 참조 변수
+    EditText edtName, edtNumber, edtNameResult,edtNumbeResult;
+    Button btnInsert, btnSelect, btnDelete, btnUpdate, btnInit;
+    SQLiteDatabase sqlDB; //읽기 전용, 쓰기 전용으로 DB를 열 용도
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        edtName=(EditText)findViewById(R.id.edtName);
+        edtNumber=(EditText)findViewById(R.id.edtNumber);
+        edtNameResult=(EditText) findViewById(R.id.edtNamResult);
+        edtNumbeResult=(EditText) findViewById(R.id.edtNumResult);
+        btnInsert=(Button)findViewById(R.id.btnInsert);
+        btnSelect=(Button)findViewById(R.id.btnSelect);
+        btnDelete=(Button)findViewById(R.id.btnDelete);
+        btnUpdate=(Button)findViewById(R.id.btnUpdate);
+        btnInit=(Button)findViewById(R.id.btnInit);
+        myHelper=new myDBHelper(this);
+
+        //그룹명, 인원수를 입력하고 [추가] 버튼을 눌러서 INSERT 쿼리를 수행하자.(중복키를 입력하면 안됨)
+
+        btnInsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //1건의 그룹을 테이블 groupTBL 에 저장하는 쿼리를 수행한다.
+            sqlDB = myHelper.getWritableDatabase(); //쓰기 전용으로 DB 열기
+            sqlDB.execSQL("INSERT INTO groupTBL VALUES('" +
+                    edtName.getText().toString() +"',"+
+                    edtNumber.getText().toString() +");");//쿼리문을 수행하는 메소드 INSERT 쿼리 레코드 1건 추가
+
+                //getText()edtName 입력란에서 가져와서 toString() 문자열 변환 처리
+                //DB 를 쓰기 전용으로 열었는데, 입력이 끝낫으니, 닫아야함
+                sqlDB.close();
+
+                Toast.makeText(getApplicationContext(),"입력됨",
+                        Toast.LENGTH_LONG).show();
+            }
+        });//btnInsert
+
+        btnSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sqlDB=myHelper.getReadableDatabase(); //조회 읽기전용으로 DB 열기
+                Cursor cursor; //모든 레코드를 조회 하려고 함, 2차원 데이터로 리턴
+                cursor=sqlDB.rawQuery("SELECT * FROM groupTBL",null);
+                //테이블 groupTBL 에서 모든 레코드의 그룸 이름만 모을 임시변수를 선언함
+                String strNames="그룹이름"+"\r\n"+" ----------"+"\r\n"; //헤더도 찍어야함.
+                String strNumbers ="그룹인원"+"\r\n"+" ----------"+"\r\n";
+
+                // 모든 레코드를  다 추출(이르, 인원)해야함.
+                while(cursor.moveToNext()){ //true 이면 추출
+                    strNames+=cursor.getString(0)+"\r\n"; //필드가 개  항목 식별 0열, 1열로 식별, 이름 추출
+                    strNumbers+=cursor.getString(1)+"\r\n"; //1열, 인원식별
+                }//while 조건은 다음 건(레코드)이 있으면 추출해라
+
+                //연두색 edtNameResult, 파란색 edtNumberResult에 설정
+                edtNameResult.setText((strNames));
+                edtNumbeResult.setText(strNumbers);
+                //2차원 course
+                cursor.close();
+                sqlDB.close();
+                //   그룹이름
+                // ------------
+            }
+        });
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sqlDB=myHelper.getWritableDatabase();
+                if(edtName.getText().toString()!=""){
+                    sqlDB.execSQL("DELETE FROM groupTBL WHERE gName='"
+                            +edtName.getText().toString()+"';");
+                }//if  공란이 아니면 해당건을 찾으러 감
+                sqlDB.close();;
+                Toast.makeText(getApplicationContext(),"삭제됨",
+                        Toast.LENGTH_LONG).show();
+                        btnSelect.callOnClick();//[조회] 버튼 메소드 호출
+            }//onClicker()
+        });//btnDelete
+
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sqlDB=myHelper.getWritableDatabase();
+                if(edtName.getText().toString()!=""){//공백이 아니면
+                    sqlDB.execSQL("UPDATE groupTBL SET gNumber="
+                           +edtNumber.getText()+" WHERE gName='"
+                           +edtName.getText().toString()+"';");
+                }//if
+                sqlDB.close();
+                Toast.makeText(getApplicationContext(),"수정됨",
+                        Toast.LENGTH_LONG).show();
+                btnSelect.callOnClick();//[조회] 버튼 메소드 호출
+            }//
+        }); //btnUpdate
+
+        btnInit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sqlDB=myHelper.getWritableDatabase();
+                myHelper.onUpgrade(sqlDB,1,2); //테이블이 있으면 삭제하고 다시 생섬함
+                sqlDB.close();
+                btnInit.callOnClick();
+            }//
+        });//btnInit
+    }//onCreate()밖
+    public class myDBHelper extends SQLiteOpenHelper{
+        public  myDBHelper(Context context){
+            super(context, "groupDB", null, 1);
+        }
+        public void onCreate(SQLiteDatabase sqLiteDatabase){
+            sqLiteDatabase.execSQL(
+        "CREATE TABLE groupTBL(gName CHAR(20) PRIMARY KEY, gNumber INTGER);");
+        }
+        public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1){
+            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS groupTBL");
+            onCreate(sqLiteDatabase);
+        }//groupTBL 테이블이 있으면 테이블을 삭제 하고 onCRATE()메소드로 이동
+    }//myDBHelper
+    }//MainActivity
